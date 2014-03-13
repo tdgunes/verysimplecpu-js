@@ -12,7 +12,6 @@ evaluation.LT = function LT(A, B){
     else {
         MEMORY[A] = 0;
     }
-
 }
 evaluation.LTi = function LTi(A, B){
     if ( MEMORY[A] < B){
@@ -34,12 +33,18 @@ evaluation.NAND = function NAND(A,B){
 evaluation.NANDi = function NANDi(A,B){
     MEMORY[A] = ~(MEMORY[A] & B);
 }
-//FIXME - NOT IMPLEMENTED YET
 evaluation.SRL = function SRL(A,B){
-    MEMORY[A] = MEMORY[A] >> MEMORY[B];
+    if(MEMORY[B] < 32)
+        MEMORY[A] = MEMORY[A] >> MEMORY[B];
+    else
+        MEMORY[A] = MEMORY[A] << (MEMORY[B]-32);
 }
 evaluation.SRLi = function SRLi(A,B){
-    MEMORY[A] = MEMORY[A] << MEMORY[B];
+    if(B < 32)
+        MEMORY[A] = MEMORY[A] >> B;
+    else
+        MEMORY[A] = MEMORY[A] << (B-32);
+
 }
 evaluation.CP = function CP(A,B){
     MEMORY[A] = MEMORY[B];
@@ -56,9 +61,12 @@ evaluation.CPIi = function CPIi(A,B){
 evaluation.BZJ = function BZJ(A,B){
     if (MEMORY[B]==0){
         prevPC = PC;
-        PC = parseInt(MEMORY[A]);
+        setPC(parseInt(MEMORY[A])-1); // It will be equal to MEMORY[A] after step.
     }
-
+}
+evaluation.BZJi = function BZJi(A,B){
+    prevPC = PC;
+    setPC(parseInt(MEMORY[A])-B-1); // It will be equal to MEMORY[A] after step.
 }
 evaluation.MUL = function MUL(A,B){
     MEMORY[A] = MEMORY[A] * MEMORY[B];
@@ -154,12 +162,19 @@ $( document ).ready(function() {
 });
 
 $("#build").click( function(){
+    setPC(0);
+    fillMemory();
+    showMemory();
+    for (var i = 0; i < MEMORY_SIZE; i++) {
+        $("#loc-"+(i)).removeClass('active');
+        $("#loc-"+i).removeClass('success');
+    }
+
     $('#build-message').text("Parsing...");
     parse(editor.getValue());
     $('#build-message').text("Preparing Memory...");
     showMemory();
     $('#build-message').text("Build Done.");
-    setPC(0);
 
 });
 
