@@ -2,6 +2,11 @@
  * Created by tdgunes, huyumaz on 3/13/14.
  */
 
+
+
+
+
+
 Array.prototype.contains = function ( needle ) {
     for (i in this) {
         if (this[i] == needle) return true;
@@ -87,6 +92,9 @@ evaluation.MULi = function MULi(A,B){
 var beforePrevPC=0;
 var prevPC = 0;
 var PC = 0;
+
+var prevEditedRow = 0;
+
 var MEMORY = [];
 var MEMORY_SIZE = 2000;
 var editor;
@@ -191,9 +199,74 @@ $( document ).ready(function() {
     for (var i=0; i<2000; i++){
        $('#memory').find('tr:last').after('<tr id=\'loc-'+i+'\' > <td >'+i+'</td><td id=\'val-'+i+'\'>0</td></tr>');
     }
-//$("#td_id").attr('class', 'newClass');
+
+
+
+
+    define("VerySimpleCPUHighlightRules", [], function(require, exports, module){
+        "use strict";
+
+        var oop = require("ace/lib/oop");
+
+        var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
+
+        var VerySimpleCPUHighlightRules = function() {
+            var keywords = (
+                "CP|CPi|BZJ|BZJi|LT|LTi|SRL|SRLi|" +
+                "NAND|NANDi|MUL|MULi|ADDi|ADD"
+                );
+            var builtinTypes = ("");
+            var builtinFunctions = ("");
+            var builtinConstants = ("");
+
+            var keywordMapper = this.createKeywordMapper({
+                "keyword": keywords,
+                "constant.language": builtinConstants,
+                "support.function": builtinFunctions,
+                "support.type": builtinTypes
+            }, "identifier");
+
+            this.$rules = {
+                "start" : [
+                    {
+                        token : "comment", //keywords
+                        regex : "\\/\\/.*$"
+                    },
+                    {
+                        token : "constant.numeric", // memory address with :
+                        regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b[:]"
+                    },
+                    {
+                        token : "text", // memory address without :
+                        regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+                    },
+
+                    {
+                        token : keywordMapper, //special very simple cpu commands
+                        regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+                    }
+                ]
+
+            };
+
+        };
+        oop.inherits(VerySimpleCPUHighlightRules, TextHighlightRules);
+
+        exports.VerySimpleCPUHighlightRules = VerySimpleCPUHighlightRules;
+    });
+
+
+
+
+
+
     editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
+    var TextMode = require("ace/mode/text").Mode;
+    var verySimpleCPUMode = new TextMode();
+    verySimpleCPUMode.HighlightRules = require("VerySimpleCPUHighlightRules").VerySimpleCPUHighlightRules;
+
+    editor.session.setMode(verySimpleCPUMode);
     //editor.getSession().setMode("ace/mode/javascript");
 
     editor.commands.addCommand({
@@ -220,7 +293,20 @@ $( document ).ready(function() {
         readOnly: false // false if this command should not apply in readOnly mode
     });
 
+
+
     updateMemory();
+    $.getJSON("https://api.github.com/repos/tdgunes/verysimplecpu-js/commits", function(data) {
+
+        $("#last-commit").html("Latest commit:</br> by <kbd>"+
+            data[0].commit.committer.name +
+            "</kbd> says <code>"+
+            data[0].commit.message +
+            "</code>  at  <code>" +
+            data[0].commit.committer.date +"</code>" +
+            " ");
+
+    });
 });
 
 
@@ -250,6 +336,7 @@ $("#reset").click( function(){
     for (var i = 0; i < MEMORY_SIZE; i++) {
         $("#loc-"+(i)).removeClass('active');
         $("#loc-"+i).removeClass('success');
+        $("#loc-"+i).removeClass('warning');
     }
     updateMemory();
 
@@ -293,6 +380,7 @@ $("#step").click( function(){
     $("#loc-"+(prevPC)).attr('class', 'active');
     $("#loc-"+PC).attr('class', 'success');
 
+
     //alert(_memoryBlock);
     var _commands = _memoryBlock.split(" ");
 
@@ -303,6 +391,10 @@ $("#step").click( function(){
     var A = parseInt(_commands[1]);
     var B = parseInt(_commands[2]);
     var _fun = evaluation[command];
+
+    $("#loc-"+prevEditedRow).removeClass('warning');
+    $("#loc-"+A).attr('class','warning');
+    prevEditedRow=A;
 
     _fun(A,B);
     if(command!=="BZJ" && command!=="BZJi" )

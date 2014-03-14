@@ -37,13 +37,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">VerySimpleCPU-JS</a>
+            <a class="navbar-brand" href="http://ozucc.org/"><img src="transparent-club-logo.png" alt="" style="width:20%"></a>
 
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
+                <!--<li class="active"><a href="#">Home</a></li>-->
+                <!--<li><a href="#about">About</a></li>-->
                 <!--<li><a href="#contact">Contact</a></li>-->
             </ul>
         </div><!--/.nav-collapse -->
@@ -52,7 +52,9 @@
 </div>
 
 <div class="container">
-    <img src="transparent-club-logo.png" alt="" style="width:40%">
+
+    <p id="last-commit"></br></br></p>
+    <pre>VerySimpleCPU-JS is a currently under heavy development,</br> for any bugs that you may encounter please report them <a href="https://github.com/tdgunes/verysimplecpu-js/issues">here</a>. Thanks!</pre>
     <div class="row">
         <div class="col-xs-6"><h1>Memory</h1>
             <span>PC:</span><code id="PC">0</code>
@@ -104,7 +106,7 @@
                     </ul>
                 </div>
             </div></h1>
-            <span id="build-message">Write your Assembly code here</span>
+            <span id="build-message"></span>
             <div id="editor">0: ADDi 10 10
 1: CP 11 10</div>
 
@@ -131,7 +133,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/evaluate.js"></script>
-<script src="js/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<!--<script src="js/require.js"></script>-->
+<script src="https://ajaxorg.github.io/ace-builds/src/ace.js"></script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
