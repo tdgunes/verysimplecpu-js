@@ -252,7 +252,7 @@ $("#reset").click( function(){
         $("#loc-"+i).removeClass('success');
     }
     updateMemory();
-    
+
 
 
 });
@@ -293,7 +293,7 @@ $("#step").click( function(){
     $("#loc-"+(prevPC)).attr('class', 'active');
     $("#loc-"+PC).attr('class', 'success');
 
-    alert(_memoryBlock);
+    //alert(_memoryBlock);
     var _commands = _memoryBlock.split(" ");
 
     //ADDi 10 10
