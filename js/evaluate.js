@@ -210,6 +210,34 @@ $("#reset").click( function(){
     updateMemory();
 
 });
+$('#run').click( function(){
+    var isFirstStep=true;
+    while((prevPC!==PC) || isFirstStep || editor.getValue().length<1){
+       var _memoryBlock = MEMORY[PC];
+        $("#loc-"+(beforePrevPC)).removeClass('active');
+        $("#loc-"+(beforePrevPC)).removeClass('success');
+        $("#loc-"+(prevPC)).attr('class', 'active');
+        $("#loc-"+PC).attr('class', 'success');
+
+
+        var _commands = _memoryBlock.split(" ");
+        //ADDi 10 10
+        //alert(_commands);
+
+        var command = _commands[0];
+        var A = parseInt(_commands[1]);
+        var B = parseInt(_commands[2]);
+        var _fun = evaluation[command];
+
+        _fun(A,B);
+        if(command!=="BZJ" && command!=="BZJi" )
+            setPC(prevPC,PC,PC+1);
+
+        showMemory();
+        updateMemory();
+        isFirstStep=false;
+    }
+})
 $("#step").click( function(){
     var _memoryBlock = MEMORY[PC];
     $("#loc-"+(beforePrevPC)).removeClass('active');
