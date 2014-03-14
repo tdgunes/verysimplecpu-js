@@ -61,6 +61,8 @@ evaluation.CPIi = function CPIi(A,B){
 evaluation.BZJ = function BZJ(A,B){
     if (MEMORY[B]==0){
         setPC(prevPC,PC,parseInt(MEMORY[A])); 
+    }else{
+        setPC(prevPC,PC,PC+1);
     }
 }
 evaluation.BZJi = function BZJi(A,B){
@@ -205,6 +207,7 @@ $("#reset").click( function(){
         $("#loc-"+(i)).removeClass('active');
         $("#loc-"+i).removeClass('success');
     }
+    updateMemory();
 
 });
 $("#step").click( function(){
