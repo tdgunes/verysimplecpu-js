@@ -60,13 +60,11 @@ evaluation.CPIi = function CPIi(A,B){
 }
 evaluation.BZJ = function BZJ(A,B){
     if (MEMORY[B]==0){
-        prevPC = PC;
-        setPC(parseInt(MEMORY[A])-1); // It will be equal to MEMORY[A] after step.
+        setPC(prevPC,PC,parseInt(MEMORY[A])); 
     }
 }
 evaluation.BZJi = function BZJi(A,B){
-    prevPC = PC;
-    setPC(parseInt(MEMORY[A])-B-1); // It will be equal to MEMORY[A] after step.
+    setPC(prevPC,PC,parseInt(MEMORY[A])-B);
 }
 evaluation.MUL = function MUL(A,B){
     MEMORY[A] = MEMORY[A] * MEMORY[B];
@@ -76,16 +74,18 @@ evaluation.MULi = function MULi(A,B){
 }
 
 
-
+var beforePrevPC=0;
 var prevPC = 0;
 var PC = 0;
 var MEMORY = [];
 var MEMORY_SIZE = 2000;
 var editor;
 
-function setPC(pc){
-    PC = pc;
-    $("#PC").text(pc);
+function setPC(newBeforePrevPC,newPrevPC,newPC){
+    beforePrevPC=newBeforePrevPC;
+    prevPC=newPrevPC;
+    PC = newPC;
+    $("#PC").text(PC);
 }
 function fillMemory(){
     for (var i=0; i<MEMORY_SIZE; i++){
@@ -98,6 +98,14 @@ function showMemory(){
             $("#val-"+i).text(""+MEMORY[i]);
         }
 
+    }
+}
+function updateMemory(){
+    for(var i=0; i<MEMORY_SIZE;i++){
+        if (MEMORY[i]!==0)
+            $("#loc-"+i).show();
+        if (MEMORY[i]===0)
+            $("#loc-"+i).hide();
     }
 }
 function parse(code){
@@ -167,13 +175,13 @@ $( document ).ready(function() {
         readOnly: false // false if this command should not apply in readOnly mode
     });
 
-
+    updateMemory();
 });
 
 
 
 $("#build").click( function(){
-    setPC(0);
+    setPC(0,0,0);
     fillMemory();
     showMemory();
     for (var i = 0; i < MEMORY_SIZE; i++) {
@@ -186,11 +194,11 @@ $("#build").click( function(){
     $('#build-message').text("Preparing Memory...");
     showMemory();
     $('#build-message').text("Build Done.");
-
+    updateMemory(); 
 });
 
 $("#reset").click( function(){
-    setPC(0);
+    setPC(0,0,0);
     fillMemory();
     showMemory();
     for (var i = 0; i < MEMORY_SIZE; i++) {
@@ -201,7 +209,8 @@ $("#reset").click( function(){
 });
 $("#step").click( function(){
     var _memoryBlock = MEMORY[PC];
-
+    $("#loc-"+(beforePrevPC)).removeClass('active');
+    $("#loc-"+(beforePrevPC)).removeClass('success');
     $("#loc-"+(prevPC)).attr('class', 'active');
     $("#loc-"+PC).attr('class', 'success');
 
@@ -216,12 +225,11 @@ $("#step").click( function(){
     var _fun = evaluation[command];
 
     _fun(A,B);
-
-    prevPC = PC;
-    setPC(PC+1);
+    if(command!=="BZJ" && command!=="BZJi" )
+        setPC(prevPC,PC,PC+1);
 
     showMemory();
-
+    updateMemory();
 });
 
 
