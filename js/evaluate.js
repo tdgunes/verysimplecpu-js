@@ -2,9 +2,17 @@
  * Created by tdgunes, huyumaz on 3/13/14.
  */
 
+Array.prototype.contains = function ( needle ) {
+    for (i in this) {
+        if (this[i] == needle) return true;
+    }
+    return false;
+}
 
 //FIXME ALL MEMORY ACCESSES REQUIRES ERROR HANDLING
 var evaluation = {};
+var defined_zeros = []; //explicitly defined
+
 evaluation.LT = function LT(A, B){
     if ( MEMORY[A] < MEMORY[B]){
         MEMORY[A] = 1;
@@ -66,7 +74,7 @@ evaluation.BZJ = function BZJ(A,B){
     }
 }
 evaluation.BZJi = function BZJi(A,B){
-    setPC(prevPC,PC,parseInt(MEMORY[A])-B);
+    setPC(prevPC,PC,parseInt(MEMORY[A])+B);
 }
 evaluation.MUL = function MUL(A,B){
     MEMORY[A] = MEMORY[A] * MEMORY[B];
@@ -92,6 +100,7 @@ function setPC(newBeforePrevPC,newPrevPC,newPC){
 function fillMemory(){
     for (var i=0; i<MEMORY_SIZE; i++){
         MEMORY[i] = 0;
+
     }
 }
 function showMemory(){
@@ -104,56 +113,76 @@ function showMemory(){
 }
 function updateMemory(){
     for(var i=0; i<MEMORY_SIZE;i++){
-        if (MEMORY[i]!==0)
+        if (MEMORY[i]!==0 )
             $("#loc-"+i).show();
-        if (MEMORY[i]===0)
+        if (MEMORY[i]===0 ){
             $("#loc-"+i).hide();
+        }
+        if (defined_zeros.contains(i) == true){
+            $("#loc-"+i).show();
+        }
+
     }
 }
-function parse(code){
-    var lines = code.split("\n");
+
+function parseMemoryLocation(memoryToken){
+    var _tokenized = memoryToken.split(":");
+    return parseInt(_tokenized[0]);
+}
+function parseToken(token){
+    var _pieces = $.trim(token).split(" ");
+    var _memoryLocation = parseMemoryLocation(_pieces[0]);
+    if (_pieces.length == 4){
+        MEMORY[_memoryLocation] = _pieces[1] + " " +
+            _pieces[2] + " " +
+            _pieces[3];
+    }
+    else if (_pieces.length == 2){
+        defined_zeros.push(_memoryLocation);
+        MEMORY[_memoryLocation] = parseInt(_pieces[1]);
+
+    }
+    else {
+        alert("parseToken(token) failed! [" + _pieces +"]");
+    }
+}
+
+function parse(text){
+
+    //(^ *[0-9]+: *[A-z]+ +[0-9]+ +[0-9]+ *)|(^ *[0-9]+: *[0-9]+ *)
+    var lines = text.split("\n");
     for (var i = 0; i < lines.length; i++) {
-        var _line = lines[i].replace(/\s\s+/g, ' ');
-        _line = $.trim(_line);
-        //alert("'"+_line+"'");
-        if (_line){
-            var _isTokenized = _line.split(" ");
+        _line = lines[i].replace(/\s\s+/g, ' ');
+        if (_line && _line.substr(0,2)!="//"){ //if a comment line ignore or blank
 
-            //alert("'"+_isTokenized+"'");
+            var re = /(^ *[0-9]+: *[A-z]+ +[0-9]+ +[0-9]+ *)|(^ *[0-9]+: *[0-9]+ *)/
+            //console.log(_line);
+            _tokens = _line.match(re);
+            if (_tokens){
+                _token = _tokens[0];
+                parseToken(_token);
 
-            if (_isTokenized.length == 4) {
-
-                var _memoryLocation = parseInt(_isTokenized[0].split(":")[0]);
-
-                MEMORY[_memoryLocation] = _isTokenized[1] + " " +
-                                          _isTokenized[2] + " " +
-                                          _isTokenized[3];
-            }
-            else if(_isTokenized.length == 2){
-                var _memoryLocationToken = _isTokenized[0];
-                var _splittedLocation = _memoryLocationToken.split(":").filter(function(v){return v!==''});;
-                if (_splittedLocation.length==1){
-                    MEMORY[_memoryLocation] = parseInt(_isTokenized[1]);
-                }
-                else{
-                    alert("Parse error on line: " + (i + 1) +"\n" +
-                        "unable to parse memory location token");
-                    break;
-                }
-
-
-            }
-            else if (_isTokenized.length == 0){
-                //pass
             }
             else {
-                alert("Parse error on line: " + (i + 1));
-                break;
+               alert("Parse error on line="+(i+1));
+                setPC(0,0,0);
+                fillMemory();
+                showMemory();
+                for (var i = 0; i < MEMORY_SIZE; i++) {
+                    $("#loc-"+(i)).removeClass('active');
+                    $("#loc-"+i).removeClass('success');
+                }
+                updateMemory();
+
             }
         }
+
+
+
     }
 
 }
+
 
 
 $( document ).ready(function() {
@@ -214,6 +243,7 @@ $("#build").click( function(){
 });
 
 $("#reset").click( function(){
+    defined_zeros = [];
     setPC(0,0,0);
     fillMemory();
     showMemory();
@@ -222,6 +252,8 @@ $("#reset").click( function(){
         $("#loc-"+i).removeClass('success');
     }
     updateMemory();
+    
+
 
 });
 $('#run').click( function(){
@@ -234,17 +266,22 @@ $('#run').click( function(){
     var isFirstStep=true;
     while((prevPC!==PC) || isFirstStep || editor.getValue().length<1){
        var _memoryBlock = MEMORY[PC];
-        var _commands = _memoryBlock.split(" ");
-        //ADDi 10 10
-        //alert(_commands);
-        var command = _commands[0];
-        var A = parseInt(_commands[1]);
-        var B = parseInt(_commands[2]);
-        var _fun = evaluation[command];
-        _fun(A,B);
-        if(command!=="BZJ" && command!=="BZJi" )
-            setPC(prevPC,PC,PC+1);
-        isFirstStep=false;
+        if (_memoryBlock != 0){
+            var _commands = _memoryBlock.split(" ");
+            //ADDi 10 10
+            //alert(_commands);
+            var command = _commands[0];
+            var A = parseInt(_commands[1]);
+            var B = parseInt(_commands[2]);
+            var _fun = evaluation[command];
+            _fun(A,B);
+            if(command!=="BZJ" && command!=="BZJi" )
+                setPC(prevPC,PC,PC+1);
+            isFirstStep=false;
+        }
+        else {
+            break;
+        }
     }
     showMemory();
     updateMemory();
@@ -256,8 +293,9 @@ $("#step").click( function(){
     $("#loc-"+(prevPC)).attr('class', 'active');
     $("#loc-"+PC).attr('class', 'success');
 
-
+    alert(_memoryBlock);
     var _commands = _memoryBlock.split(" ");
+
     //ADDi 10 10
     //alert(_commands);
 
