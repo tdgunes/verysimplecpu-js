@@ -1,5 +1,5 @@
 /**
- * Created by tdgunes on 3/13/14.
+ * Created by tdgunes, huyumaz on 3/13/14.
  */
 
 
@@ -238,23 +238,3 @@ $("#step").click( function(){
 
 
 
-//<tr class="active">...</tr>
-//<tr class="success">...</tr>
-//    <tr class="warning">...</tr>
-//    <tr class="danger">...</tr>
-//    <tr class="info">...</tr>
-//<tr class="success">
-//    <td>0</td>
-//    <td>CP 10 100</td>
-//
-//</tr>
-//<tr>
-//<td>1</td>
-//<td>BZJi 20 0</td>
-//
-//</tr>
-//    <tr>
-//        <td>2</td>
-//        <td>LT 2 200</td>
-//
-//    </tr>
