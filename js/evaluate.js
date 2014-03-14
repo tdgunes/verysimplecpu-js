@@ -113,7 +113,8 @@ function updateMemory(){
 function parse(code){
     var lines = code.split("\n");
     for (var i = 0; i < lines.length; i++) {
-        var _line = $.trim(lines[i]);
+        var _line = lines[i].replace(/\s\s+/g, ' ');
+        _line = $.trim(_line);
         //alert("'"+_line+"'");
         if (_line){
             var _isTokenized = _line.split(" ");
@@ -122,12 +123,25 @@ function parse(code){
 
             if (_isTokenized.length == 4) {
 
-                var _memoryLocation = parseInt($.trim(_isTokenized[0]).split(":")[0]);
-                MEMORY[_memoryLocation] = $.trim(_isTokenized[1]) + " " + $.trim(_isTokenized[2]) + " " + $.trim(_isTokenized[3]);
+                var _memoryLocation = parseInt(_isTokenized[0].split(":")[0]);
+
+                MEMORY[_memoryLocation] = _isTokenized[1] + " " +
+                                          _isTokenized[2] + " " +
+                                          _isTokenized[3];
             }
             else if(_isTokenized.length == 2){
-                var _memoryLocation = parseInt($.trim(_isTokenized[0]).split(":")[0]);
-                MEMORY[_memoryLocation] = parseInt($.trim(_isTokenized[1]));
+                var _memoryLocationToken = _isTokenized[0];
+                var _splittedLocation = _memoryLocationToken.split(":").filter(function(v){return v!==''});;
+                if (_splittedLocation.length==1){
+                    MEMORY[_memoryLocation] = parseInt(_isTokenized[1]);
+                }
+                else{
+                    alert("Parse error on line: " + (i + 1) +"\n" +
+                        "unable to parse memory location token");
+                    break;
+                }
+
+
             }
             else if (_isTokenized.length == 0){
                 //pass
