@@ -7,7 +7,15 @@ function Processor() {
     var memory = new Memory();
     var pc = 0;
 };
-
+Processor.prototype.getMemory = function () {
+    return memory;
+};
+Processor.prototype.setPC = function (pc) {
+    this.pc = pc;
+};
+Processor.prototype.incrementPC = function () {
+    this.pc++;
+};
 Processor.prototype.step = function () {
 };
 Processor.prototype.run = function () {
@@ -17,12 +25,15 @@ Processor.prototype.runUntilBreakpoint = function () {
 Processor.prototype.build = function (breakpoint) {
 };
 
+
 function Memory() {
     var elements = new Array();
 };
 Memory.prototype.changeElementType = function (memoryLocation) {
 };
 Memory.prototype.getElement = function (memoryLocation) {
+};
+Memory.prototype.setElement = function (memoryLocation, newValue) {
 };
 Memory.prototype.isGarbageElement = function (memoryLocation) {
 };
@@ -76,13 +87,18 @@ function ADD(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    ADD.call(this);
+    InstructionElement.call(this);
 };
 ADD.prototype = new InstructionElement();
 ADD.prototype.getInfo = function () {
 };
 ADD.prototype.constructor = ADD;
 ADD.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    memory.setElement(A, elementA + elementB);
+
 };
 
 function ADDi(memoryLocation, A, B, processor) {
@@ -91,13 +107,16 @@ function ADDi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    ADDi.call(this);
+    InstructionElement.call(this);
 };
 ADDi.prototype = new InstructionElement();
 ADDi.prototype.constructor = ADDi;
 ADDi.prototype.getInfo = function () {
 };
 ADDi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    memory.setElement(A, elementA + B);
 };
 
 function NAND(memoryLocation, A, B, processor) {
@@ -106,13 +125,17 @@ function NAND(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    NAND.call(this);
+    InstructionElement.call(this);
 };
 NAND.prototype = new InstructionElement();
 NAND.prototype.constructor = NAND;
 NAND.prototype.getInfo = function () {
 };
 NAND.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    memory.setElement(A, ~(elementA & elementB));
 };
 
 function NANDi(memoryLocation, A, B, processor) {
@@ -121,13 +144,16 @@ function NANDi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    NANDi.call(this);
+    InstructionElement.call(this);
 };
 NANDi.prototype = new InstructionElement();
 NANDi.prototype.constructor = NANDi;
 NANDi.prototype.getInfo = function () {
 };
 NANDi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    memory.setElement(A, ~(elementA & B));
 };
 
 function SRL(memoryLocation, A, B, processor) {
@@ -136,13 +162,20 @@ function SRL(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    SRL.call(this);
+    InstructionElement.call(this);
 };
 SRL.prototype = new InstructionElement();
 SRL.prototype.constructor = SRL;
 SRL.prototype.getInfo = function () {
 };
 SRL.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    if (elementB < 32)
+        memory.setElement(A, elementA >> elementB);
+    else
+        memory.setElement(A, elementA >> (elementB - 32));
 };
 
 function SRLi(memoryLocation, A, B, processor) {
@@ -151,13 +184,19 @@ function SRLi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    SRLi.call(this);
+    InstructionElement.call(this);
 };
 SRLi.prototype = new InstructionElement();
 SRLi.prototype.constructor = SRLi;
 SRLi.prototype.getInfo = function () {
 };
 SRLi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    if (B < 32)
+        memory.setElement(A, elementA >> B);
+    else
+        memory.setElement(A, elementA >> (B - 32));
 };
 
 function LT(memoryLocation, A, B, processor) {
@@ -166,13 +205,20 @@ function LT(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    LT.call(this);
+    InstructionElement.call(this);
 };
 LT.prototype = new InstructionElement();
 LT.prototype.constructor = LT;
 LT.prototype.getInfo = function () {
 };
 LT.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    if (elementA < elementB)
+        memory.setElement(A, 1);
+    else
+        memory.setElement(A, 0);
 };
 
 function LTi(memoryLocation, A, B, processor) {
@@ -181,13 +227,19 @@ function LTi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    LTi.call(this);
+    InstructionElement.call(this);
 };
 LTi.prototype = new InstructionElement();
 LTi.prototype.constructor = LTi;
 LTi.prototype.getInfo = function () {
 };
 LTi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    if (elementA < B)
+        memory.setElement(A, 1);
+    else
+        memory.setElement(A, 0);
 };
 
 function CP(memoryLocation, A, B, processor) {
@@ -196,13 +248,16 @@ function CP(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    CP.call(this);
+    InstructionElement.call(this);
 };
 CP.prototype = new InstructionElement();
 CP.prototype.constructor = CP;
 CP.prototype.getInfo = function () {
 };
 CP.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementB = memory.getElement(B);
+    memory.setElement(A, elementB);
 };
 
 function CPi(memoryLocation, A, B, processor) {
@@ -211,13 +266,15 @@ function CPi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    CPi.call(this);
+    InstructionElement.call(this);
 };
 CPi.prototype = new InstructionElement();
 CPi.prototype.constructor = CPi;
 CPi.prototype.getInfo = function () {
 };
 CPi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    memory.setElement(A, B);
 };
 
 function CPI(memoryLocation, A, B, processor) {
@@ -226,13 +283,17 @@ function CPI(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    CPI.call(this);
+    InstructionElement.call(this);
 };
 CPI.prototype = new InstructionElement();
 CPI.prototype.constructor = CPI;
 CPI.prototype.getInfo = function () {
 };
 CPI.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    memory.setElement(elementA, elementB);
 };
 
 function CPIi(memoryLocation, A, B, processor) {
@@ -241,13 +302,16 @@ function CPIi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    CPIi.call(this);
+    InstructionElement.call(this);
 };
 CPIi.prototype = new InstructionElement();
 CPIi.prototype.constructor = CPIi;
 CPIi.prototype.getInfo = function () {
 };
 CPIi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    memory.setElement(elementA, B);
 };
 
 function BZJ(memoryLocation, A, B, processor) {
@@ -256,13 +320,20 @@ function BZJ(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    BZJ.call(this);
+    InstructionElement.call(this);
 };
 BZJ.prototype = new InstructionElement();
 BZJ.prototype.constructor = BZJ;
 BZJ.prototype.getInfo = function () {
 };
 BZJ.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    if (elementB == 0)
+        processor.setPC(elementA);
+    else
+        processor.incrementPC();
 };
 
 function BZJi(memoryLocation, A, B, processor) {
@@ -271,13 +342,16 @@ function BZJi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    BZJi.call(this);
+    InstructionElement.call(this);
 };
 BZJi.prototype = new InstructionElement();
 BZJi.prototype.constructor = BZJi;
 BZJi.prototype.getInfo = function () {
 };
 BZJi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    processor.setPC(elementA + B);
 };
 
 function MUL(memoryLocation, A, B, processor) {
@@ -286,13 +360,17 @@ function MUL(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    MUL.call(this);
+    InstructionElement.call(this);
 };
 MUL.prototype = new InstructionElement();
 MUL.prototype.constructor = MUL;
 MUL.prototype.getInfo = function () {
 };
 MUL.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    var elementB = memory.getElement(B);
+    memory.setElement(A, elementA * elementB);
 };
 
 function MULi(memoryLocation, A, B, processor) {
@@ -301,13 +379,16 @@ function MULi(memoryLocation, A, B, processor) {
     var A = A;
     var B = B;
     var processor = processor;
-    MULi.call(this);
+    InstructionElement.call(this);
 };
 MULi.prototype = new InstructionElement();
 MULi.prototype.constructor = MULi;
 MULi.prototype.getInfo = function () {
 };
 MULi.prototype.eval = function () {
+    var memory = processor.getMemory();
+    var elementA = memory.getElement(A);
+    memory.setElement(A, elementA * B);
 };
 
 
