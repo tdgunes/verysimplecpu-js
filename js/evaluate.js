@@ -32,12 +32,19 @@ function Memory() {
 Memory.prototype.changeElementType = function (memoryLocation) {
 };
 Memory.prototype.getElement = function (memoryLocation) {
+    return elements[memoryLocation];
 };
 Memory.prototype.setElement = function (memoryLocation, newValue) {
+    elements[memoryLocation] = newValue;
 };
 Memory.prototype.isGarbageElement = function (memoryLocation) {
+    if (elements[memoryLocation] == NULL)
+        return true
+    else
+        return false;
 };
 Memory.prototype.getElements = function () {
+    return elements;
 };
 Memory.prototype.addElement = function (memoryLocation, parsedLine) {
 };
@@ -52,7 +59,7 @@ MemoryElement.prototype.getMemoryLocation = function () {
 function ConstantElement(memoryLocation, value) {
     var binaryValue;
     var memoryLocation = memoryLocation;
-    var value = value;
+    setBinaryValue(value);
     MemoryElement.call(this);
 };
 ConstantElement.prototype = new MemoryElement();
@@ -60,10 +67,13 @@ ConstantElement.prototype.constructor = ConstantElement;
 ConstantElement.prototype.getMemoryLocation = function () {
 };
 ConstantElement.prototype.getBinaryValue = function () {
+    return binaryValue;
 };
-ConstantElement.prototype.getValue = function () {
-};
-ConstantElement.prototype.setValue = function (value) {
+ConstantElement.prototype.setBinaryValue = function (value) {
+    if (value < 0)
+        binaryValue = ~value + 1;
+    else
+        binaryValue = value;
 };
 
 function InstructionElement(memoryLocation, A, B, processor) {
@@ -83,6 +93,7 @@ InstructionElement.prototype.eval = function () {
 
 function ADD(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -98,11 +109,19 @@ ADD.prototype.eval = function () {
     var elementA = memory.getElement(A);
     var elementB = memory.getElement(B);
     memory.setElement(A, elementA + elementB);
-
 };
+ADD.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function ADDi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -118,9 +137,18 @@ ADDi.prototype.eval = function () {
     var elementA = memory.getElement(A);
     memory.setElement(A, elementA + B);
 };
+ADDi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function NAND(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -137,9 +165,18 @@ NAND.prototype.eval = function () {
     var elementB = memory.getElement(B);
     memory.setElement(A, ~(elementA & elementB));
 };
+NAND.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 1 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function NANDi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -155,9 +192,18 @@ NANDi.prototype.eval = function () {
     var elementA = memory.getElement(A);
     memory.setElement(A, ~(elementA & B));
 };
+NANDi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 1 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function SRL(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -177,9 +223,18 @@ SRL.prototype.eval = function () {
     else
         memory.setElement(A, elementA >> (elementB - 32));
 };
+SRL.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 2 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function SRLi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -198,9 +253,18 @@ SRLi.prototype.eval = function () {
     else
         memory.setElement(A, elementA >> (B - 32));
 };
+SRLi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 2 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function LT(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -220,9 +284,18 @@ LT.prototype.eval = function () {
     else
         memory.setElement(A, 0);
 };
+LT.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 3 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function LTi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -241,9 +314,18 @@ LTi.prototype.eval = function () {
     else
         memory.setElement(A, 0);
 };
+LTi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 3 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function CP(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -259,9 +341,18 @@ CP.prototype.eval = function () {
     var elementB = memory.getElement(B);
     memory.setElement(A, elementB);
 };
+CP.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 4 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function CPi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -276,9 +367,18 @@ CPi.prototype.eval = function () {
     var memory = processor.getMemory();
     memory.setElement(A, B);
 };
+CPi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 4 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function CPI(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -295,9 +395,18 @@ CPI.prototype.eval = function () {
     var elementB = memory.getElement(B);
     memory.setElement(elementA, elementB);
 };
+CPI.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 5 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function CPIi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -313,9 +422,18 @@ CPIi.prototype.eval = function () {
     var elementA = memory.getElement(A);
     memory.setElement(elementA, B);
 };
+CPIi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 5 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function BZJ(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -335,9 +453,18 @@ BZJ.prototype.eval = function () {
     else
         processor.incrementPC();
 };
+BZJ.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 6 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function BZJi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -353,9 +480,18 @@ BZJi.prototype.eval = function () {
     var elementA = memory.getElement(A);
     processor.setPC(elementA + B);
 };
+BZJi.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 6 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function MUL(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -372,9 +508,18 @@ MUL.prototype.eval = function () {
     var elementB = memory.getElement(B);
     memory.setElement(A, elementA * elementB);
 };
+MUL.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 7 * Math.pow(2, 29) + 0 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 function MULi(memoryLocation, A, B, processor) {
     var binaryValue;
+    var isBinaryCalculated = false;
     var memoryLocation = memoryLocation;
     var A = A;
     var B = B;
@@ -390,6 +535,14 @@ MULi.prototype.eval = function () {
     var elementA = memory.getElement(A);
     memory.setElement(A, elementA * B);
 };
+MUL.prototype.getBinaryValue = function () {
+    if (!isBinaryCalculated) {
+        binaryValue += 7 * Math.pow(2, 29) + 1 * Math.pow(2, 28) + A * Math.pow(2, 14) + B;
+        isBinaryCalculated = true;
+        return binaryValue;
+    } else
+        return binaryValue;
+}
 
 
 Array.prototype.contains = function ( needle ) {
