@@ -464,7 +464,7 @@ function parse(text){
     //(^ *[0-9]+: *[A-z]+ +[0-9]+ +[0-9]+ *)|(^ *[0-9]+: *[0-9]+ *)
     var lines = text.split("\n");
     for (var i = 0; i < lines.length; i++) {
-        _line = lines[i].replace(/\s\s+/g, ' ');
+        _line = $.trim(lines[i].replace(/\s\s+/g, ' '));
         if (_line && _line.substr(0,2)!="//"){ //if a comment line ignore or blank
 
             var re = /(^ *[0-9]+: *[A-z]+ +[0-9]+ +[0-9]+ *)|(^ *[0-9]+: *[0-9]+ *)/
@@ -516,7 +516,7 @@ $( document ).ready(function() {
 
         var VerySimpleCPUHighlightRules = function() {
             var keywords = (
-                "CP|CPi|BZJ|BZJi|LT|LTi|SRL|SRLi|" +
+                "CP|CPi|CPI|CPIi|BZJ|BZJi|LT|LTi|SRL|SRLi|" +
                 "NAND|NANDi|MUL|MULi|ADDi|ADD"
                 );
             var builtinTypes = ("");
