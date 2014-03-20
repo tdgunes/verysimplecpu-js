@@ -4,7 +4,7 @@
 
 
 function Processor() {
-    var memory = new Memory();
+    var memory = new Memory(this);
     var pc = 0;
 };
 Processor.prototype.getMemory = function () {
@@ -26,11 +26,77 @@ Processor.prototype.build = function (breakpoint) {
 };
 
 
-function Memory() {
+function Memory(managerProcessor) {
     var elements = new Array();
+    var processor = managerProcessor;
 };
 Memory.prototype.changeElementType = function (memoryLocation) {
+    var element = elements[memoryLocation];
+    var elementValue = element.getBinaryValue();
+    if (element instanceof InstructionElement)
+
+        elements[memoryLocation] = new ConstantElement(memoryLocation, elementValue);
+    else if (element instanceof  ConstantElement) {
+        elements[memoryLocation] = new Ins
+    }
 };
+Memory.prototype.changeElementToInstruction = function (memoryLocation, binaryValue) {
+    var optcode = binaryValue / Math.pow(2, 29);
+    var A = (binaryValue - optcode * Math.pow(2, 29)) / Math.pow(2, 14);
+    var B = binaryValue - optcode * Math.pow(2, 29) - A * Math.pow(2, 14);
+    switch (optcode) {
+        case 0:
+            ADD(memoryLocation, A, B, this.proceesor);
+            break;
+        case 1:
+            ADDi(memoryLocation, A, B, this.proceesor);
+            break;
+        case 2:
+            NAND(memoryLocation, A, B, this.proceesor);
+            break;
+        case 3:
+            NANDi(memoryLocation, A, B, this.proceesor);
+            break;
+        case 4:
+            SRL(memoryLocation, A, B, this.proceesor);
+            break;
+        case 5:
+            SRLi(memoryLocation, A, B, this.proceesor);
+            break;
+        case 6:
+            LT(memoryLocation, A, B, this.proceesor);
+            break;
+        case 7:
+            LTi(memoryLocation, A, B, this.proceesor);
+            break;
+        case 8:
+            CP(memoryLocation, A, B, this.proceesor);
+            break;
+        case 9:
+            CPi(memoryLocation, A, B, this.proceesor);
+            break;
+        case 10:
+            CPI(memoryLocation, A, B, this.proceesor);
+            break;
+        case 11:
+            CPIi(memoryLocation, A, B, this.proceesor);
+            break;
+        case 12:
+            BZJ(memoryLocation, A, B, this.proceesor);
+            break;
+        case 13:
+            BZJ(memoryLocation, A, B, this.proceesor);
+            break;
+        case 14:
+            MUL(memoryLocation, A, B, this.proceesor);
+            break;
+        case 15:
+            MULi(memoryLocation, A, B, this.proceesor);
+            break;
+
+
+    }
+}
 Memory.prototype.getElement = function (memoryLocation) {
     return elements[memoryLocation];
 };
