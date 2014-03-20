@@ -6,14 +6,20 @@
 function Processor() {
     var memory = new Memory(this);
     var pc = 0;
+    var prevPc;
+    var beforePrevPc;
 };
 Processor.prototype.getMemory = function () {
     return memory;
 };
 Processor.prototype.setPC = function (pc) {
+    this.beforePrevPc = this.prevPC;
+    this.prevPc = this.pc;
     this.pc = pc;
 };
 Processor.prototype.incrementPC = function () {
+    this.beforePrevPc = this.prevPC;
+    this.prevPc = this.pc;
     this.pc++;
 };
 Processor.prototype.step = function () {
@@ -34,11 +40,10 @@ Memory.prototype.changeElementType = function (memoryLocation) {
     var element = elements[memoryLocation];
     var elementValue = element.getBinaryValue();
     if (element instanceof InstructionElement)
-
         elements[memoryLocation] = new ConstantElement(memoryLocation, elementValue);
-    else if (element instanceof  ConstantElement) {
-        elements[memoryLocation] = new Ins
-    }
+    else if (element instanceof  ConstantElement)
+        elements[memoryLocation] = changeElementToInstruction(memoryLocation, elementValue);
+
 };
 Memory.prototype.changeElementToInstruction = function (memoryLocation, binaryValue) {
     var optcode = binaryValue / Math.pow(2, 29);
@@ -131,6 +136,7 @@ function ConstantElement(memoryLocation, value) {
 ConstantElement.prototype = new MemoryElement();
 ConstantElement.prototype.constructor = ConstantElement;
 ConstantElement.prototype.getMemoryLocation = function () {
+    return this.memoryLocation;
 };
 ConstantElement.prototype.getBinaryValue = function () {
     return binaryValue;
@@ -152,6 +158,9 @@ function InstructionElement(memoryLocation, A, B, processor) {
 };
 InstructionElement.prototype = new MemoryElement();
 InstructionElement.prototype.constructor = InstructionElement;
+InstructionElement.prototype.getMemoryLocation = function () {
+    return this.memoryLocation;
+};
 InstructionElement.prototype.getInfo = function () {
 };
 InstructionElement.prototype.eval = function () {
