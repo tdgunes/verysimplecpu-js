@@ -497,12 +497,15 @@ function parse(text){
 
 
 
+
 $( document ).ready(function() {
     fillMemory();
     //16384
     for (var i=0; i<2000; i++){
        $('#memory').find('tr:last').after('<tr id=\'loc-'+i+'\' > <td >'+i+'</td><td id=\'val-'+i+'\'>0</td></tr>');
     }
+
+
 
 
 
@@ -577,13 +580,22 @@ $( document ).ready(function() {
         name: 'build',
         bindKey: {win: 'Ctrl-B',  mac: 'Command-B'},
         exec: function(editor) {
-            $('#build-message').text("Parsing...");
-//            $("#loc-"+num).attr('class', 'success');
-            parse(editor.getValue());
 
+            setPC(0,0,0);
+            fillMemory();
             showMemory();
+            for (var i = 0; i < MEMORY_SIZE; i++) {
+                $("#loc-"+(i)).removeClass('active');
+                $("#loc-"+i).removeClass('success');
+            }
 
-//            num++;
+            $('#build-message').text("Parsing...");
+            parse(editor.getValue());
+            $('#build-message').text("Preparing Memory...");
+            showMemory();
+            $('#build-message').text("Build Done.");
+            updateMemory();
+
         },
         readOnly: false // false if this command should not apply in readOnly mode
     });
@@ -597,9 +609,27 @@ $( document ).ready(function() {
         readOnly: false // false if this command should not apply in readOnly mode
     });
 
+    editor.commands.addCommand({
+        name: 'save',
+        bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+        exec: function(editor) {
+            $('#build-message').text("Saved!");
+            localStorage.editorText = editor.getValue();
+        },
+        readOnly: false // false if this command should not apply in readOnly mode
+    });
 
 
     updateMemory();
+
+
+    if (localStorage.editorText)
+    {
+        editor.setValue(localStorage.editorText, 1);
+    }
+
+
+
     $.getJSON("https://api.github.com/repos/tdgunes/verysimplecpu-js/commits", function(data) {
 
         $("#last-commit").html("Latest commit:</br> by <kbd>"+
@@ -611,6 +641,12 @@ $( document ).ready(function() {
             " ");
 
     });
+
+    setInterval(
+        function(){
+            localStorage.editorText = editor.getValue();
+
+    },3000);
 });
 
 
