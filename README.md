@@ -3,7 +3,7 @@ verysimplecpu-js
 
 VerySimpleCPU-JS is a web application that you can write, run and debug your verysimplecpu programs inside a web browser.
 
-You can try it out the demo [here](http://verysimplecpu.com).
+You can try it out the demo [here](http://tdgunes.org/verysimplecpu/).
 
 License
 =======
