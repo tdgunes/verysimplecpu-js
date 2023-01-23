@@ -8,7 +8,7 @@ You can try it out the demo [here](http://tdgunes.com/verysimplecpu/).
 License
 =======
 
-VerySimpleCPU-JS is developed by [Taha Doğan Güneş](http://tdgunes.org/) and Hakan Uyumaz and licensed under [GPLv3](https://www.gnu.org/copyleft/gpl.html). 
+VerySimpleCPU-JS is developed by [Taha Doğan Güneş](http://tdgunes.com/) and Hakan Uyumaz and licensed under [GPLv3](https://www.gnu.org/copyleft/gpl.html). 
 
 
 Acknowledgement
