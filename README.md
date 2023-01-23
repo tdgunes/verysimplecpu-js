@@ -3,12 +3,12 @@ verysimplecpu-js
 
 VerySimpleCPU-JS is a web application that you can write, run and debug your verysimplecpu programs inside a web browser.
 
-You can try it out the demo [here](http://tdgunes.com/verysimplecpu/).
+You can try it out the demo [here](https://tdgunes.com/verysimplecpu-js/).
 
 License
 =======
 
-VerySimpleCPU-JS is developed by [Taha Doğan Güneş](http://tdgunes.com/) and Hakan Uyumaz and licensed under [GPLv3](https://www.gnu.org/copyleft/gpl.html). 
+VerySimpleCPU-JS is developed by [Taha Doğan Güneş](https://tdgunes.com/verysimplecpu-js/) and Hakan Uyumaz and licensed under [GPLv3](https://www.gnu.org/copyleft/gpl.html). 
 
 
 Acknowledgement
